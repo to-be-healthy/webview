@@ -1,8 +1,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <!-- 인터넷 사용 권한-->
-    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.INTERNET"/>
     <application
-        android:label="web_view_app"
+        android:label="건강해짐"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity
