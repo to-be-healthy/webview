@@ -1,4 +1,4 @@
-package com.example.web_view_app
+package site.tobehealthy.webview
 
 import io.flutter.embedding.android.FlutterActivity
 

@@ -1,5 +1,5 @@
 name: web_view_app
-description: "A new Flutter project."
+description: "건강해짐 애플리케이션"
 publish_to: 'none'
 
 environment:
@@ -8,28 +8,11 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  path_provider: ^2.0.6
-  # webview를 위한 플러그인 추가
-  webview_flutter: ^4.8.0
-  webview_flutter_android: ^3.16.4
-  webview_flutter_wkwebview: ^3.13.1
+  flutter_inappwebview: ^6.0.0
 
 dev_dependencies:
-  build_runner: ^2.1.5
-  espresso: ^0.2.0
   flutter_test:
     sdk: flutter
-  integration_test:
-    sdk: flutter
-  webview_flutter_platform_interface: ^2.10.0
-  flutter_launcher_icons: ^0.13.1
-
-flutter_launcher_icons:
-  android: true
-  ios: true
-  image_path_android: "assets/images/round-icon.png"
-  image_path_ios: "assets/images/icon.png"
-  remove_alpha_ios: true
 
 flutter:
   uses-material-design: true
