@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "793717607575",
+    "project_id": "solar-imprint-417411",
+    "storage_bucket": "solar-imprint-417411.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:793717607575:android:e4ebe8db6574ea1587add2",
+        "android_client_info": {
+          "package_name": "site.tobehealthy.webview"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "793717607575-2hk7b0bfbq202mmlm17br2atqgl1pop4.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBl9TuDJg677hHqs04PtNkpqVuwNYDmUMo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "793717607575-2hk7b0bfbq202mmlm17br2atqgl1pop4.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

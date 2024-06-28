@@ -2,9 +2,24 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+
+// 백그라운드 설정 코드는 맨 최상단에 위치해야함
+Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  print('Handling a background message ${message.messageId}');
+}
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+
+  fcmSetting();
 
   if (!kIsWeb && kDebugMode && defaultTargetPlatform == TargetPlatform.android) {
     await InAppWebViewController.setWebContentsDebuggingEnabled(kDebugMode);
@@ -23,6 +38,87 @@ class MyApp extends StatefulWidget {
 
   @override
   State<MyApp> createState() => _MyAppState();
+}
+
+Future<void> fcmSetting() async { FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+FirebaseMessaging messaging = FirebaseMessaging.instance;
+
+await messaging.setForegroundNotificationPresentationOptions(
+  alert: true,
+  badge: true,
+  sound: true,
+);
+
+NotificationSettings settings = await messaging.requestPermission(
+  alert: true,
+  announcement: false,
+  badge: true,
+  carPlay: false,
+  criticalAlert: false,
+  provisional: false,
+  sound: true,
+);
+
+const AndroidNotificationChannel channel = AndroidNotificationChannel(
+    'high_importance_channel', // id
+    'High Importance Notifications',
+    description: 'This channel is used for important notifications.',
+    importance: Importance.high,
+    playSound: true);
+
+var initialzationSettingsIOS = const DarwinInitializationSettings(
+  requestSoundPermission: true,
+  requestBadgePermission: true,
+  requestAlertPermission: true,
+);
+
+var initializationSettingsAndroid = const AndroidInitializationSettings('@mipmap/launcher_icon');
+
+var initializationSettings = InitializationSettings(android: initializationSettingsAndroid, iOS: initialzationSettingsIOS);
+final flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
+
+await flutterLocalNotificationsPlugin
+    .resolvePlatformSpecificImplementation<
+    AndroidFlutterLocalNotificationsPlugin>()
+    ?.createNotificationChannel(channel);
+
+await flutterLocalNotificationsPlugin
+    .resolvePlatformSpecificImplementation<
+    IOSFlutterLocalNotificationsPlugin>()
+    ?.getActiveNotifications();
+
+await flutterLocalNotificationsPlugin.initialize(
+  initializationSettings,
+);
+
+FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+  RemoteNotification? notification = message.notification;
+  AndroidNotification? android = message.notification?.android;
+
+  if (message.notification != null && android != null) {
+    flutterLocalNotificationsPlugin.show(
+      notification.hashCode,
+      notification?.title,
+      notification?.body,
+      NotificationDetails(
+        android: AndroidNotificationDetails(
+          channel.id,
+          channel.name,
+          icon: '@mipmap/launcher_icon',
+        ),
+      ),
+    );
+  }
+});
+
+// 토큰 발급
+var fcmToken = await FirebaseMessaging.instance.getToken();
+print('generated fcmToken => ${fcmToken}');
+
+// 토큰 리프레시 수신
+FirebaseMessaging.instance.onTokenRefresh.listen((newToken) async {
+  // save token to server
+});
 }
 
 class _MyAppState extends State<MyApp> {
@@ -68,7 +164,7 @@ class _MyAppState extends State<MyApp> {
               Expanded(
                 child: InAppWebView(
                   key: webViewKey,
-                  initialUrlRequest: URLRequest(url: WebUri("http://10.0.2.2:3000/")),
+                  initialUrlRequest: URLRequest(url: WebUri("https://www.to-be-healthy.site/")),
                   initialSettings: InAppWebViewSettings(allowsBackForwardNavigationGestures: true),
                   onWebViewCreated: (controller) {
                     webViewController = controller;
