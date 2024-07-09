@@ -68,6 +68,8 @@ Future<void> fcmSetting() async {
     sound: true,
   );
 
+  print('User granted permission: ${settings.authorizationStatus}');
+
   const AndroidNotificationChannel channel = AndroidNotificationChannel(
       'high_importance_channel', // id
       'High Importance Notifications',
@@ -102,9 +104,11 @@ Future<void> fcmSetting() async {
     initializationSettings,
   );
 
-  FirebaseMessaging.onMessage.listen(
-    (RemoteMessage message) {
-      RemoteNotification? notification = message.notification;
+  FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+    print('Got a message whilst in the foreground!');
+    print('Message data: ${message.data}');
+
+    RemoteNotification? notification = message.notification;
       AndroidNotification? android = message.notification?.android;
 
       if (message.notification != null && android != null) {
