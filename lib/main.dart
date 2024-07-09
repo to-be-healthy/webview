@@ -189,8 +189,7 @@ class _MyAppState extends State<MyApp> {
                     javaScriptCanOpenWindowsAutomatically: true,
                   ),
                   onWebViewCreated: (controller) {
-                    webViewController = controller;
-                    webViewController?.addJavaScriptHandler(
+                    controller.addJavaScriptHandler(
                       handlerName: 'Channel',
                       callback: (args) async {
                         // 로그인 성공 시 FCM 토큰 발급 및 백엔드로 전송
