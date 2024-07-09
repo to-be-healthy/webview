@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -9,9 +8,8 @@ import 'firebase_options.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:http/http.dart' as http;
-import 'package:permission_handler/permission_handler.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'dart:io'; // Platform 클래스를 사용하기 위해 추가
+import 'dart:io';
 
 // 백그라운드 설정 코드는 맨 최상단에 위치해야함
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
@@ -104,33 +102,37 @@ Future<void> fcmSetting() async {
     initializationSettings,
   );
 
-  FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-    RemoteNotification? notification = message.notification;
-    AndroidNotification? android = message.notification?.android;
+  FirebaseMessaging.onMessage.listen(
+    (RemoteMessage message) {
+      RemoteNotification? notification = message.notification;
+      AndroidNotification? android = message.notification?.android;
 
-    if (message.notification != null && android != null) {
-      flutterLocalNotificationsPlugin.show(
-        notification.hashCode,
-        notification?.title,
-        notification?.body,
-        NotificationDetails(
-          android: AndroidNotificationDetails(
-            channel.id,
-            channel.name,
-            icon: '@mipmap/launcher_icon',
+      if (message.notification != null && android != null) {
+        flutterLocalNotificationsPlugin.show(
+          notification.hashCode,
+          notification?.title,
+          notification?.body,
+          NotificationDetails(
+            android: AndroidNotificationDetails(
+              channel.id,
+              channel.name,
+              icon: '@mipmap/launcher_icon',
+            ),
           ),
-        ),
-      );
-    }
-  });
+        );
+      }
+    },
+  );
 
   // 토큰 리프레시 수신
-  FirebaseMessaging.instance.onTokenRefresh.listen((newToken) async {
-    String? memberId = await storage.read(key: 'memberId');
-    if (memberId != null) {
-      await sendTokenToServer(int.parse(memberId), newToken);
-    }
-  });
+  FirebaseMessaging.instance.onTokenRefresh.listen(
+    (newToken) async {
+      String? memberId = await storage.read(key: 'memberId');
+      if (memberId != null) {
+        await sendTokenToServer(int.parse(memberId), newToken);
+      }
+    },
+  );
 }
 
 class _MyAppState extends State<MyApp> {
@@ -179,7 +181,8 @@ class _MyAppState extends State<MyApp> {
                 child: InAppWebView(
                   key: webViewKey,
                   initialUrlRequest: URLRequest(
-                      url: WebUri("https://www.to-be-healthy.site/")),
+                    url: WebUri("https://www.to-be-healthy.site/"),
+                  ),
                   initialSettings: InAppWebViewSettings(
                     allowsBackForwardNavigationGestures: true,
                     javaScriptEnabled: true,
@@ -187,7 +190,7 @@ class _MyAppState extends State<MyApp> {
                   ),
                   onWebViewCreated: (controller) {
                     webViewController = controller;
-                    controller.addJavaScriptHandler(
+                    webViewController?.addJavaScriptHandler(
                       handlerName: 'Channel',
                       callback: (args) async {
                         // 로그인 성공 시 FCM 토큰 발급 및 백엔드로 전송
@@ -220,7 +223,8 @@ Future<void> sendTokenToServer(int memberId, String fcmToken) async {
     Uri.parse('https://api.to-be-healthy.site/push/v1/webview'),
     headers: {'Content-Type': 'application/json'},
     body: jsonEncode(
-        {'memberId': memberId, 'token': fcmToken, 'deviceType': deviceType}),
+      {'memberId': memberId, 'token': fcmToken, 'deviceType': deviceType},
+    ),
   );
 
   if (response.statusCode == 200) {
