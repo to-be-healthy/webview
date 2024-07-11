@@ -66,10 +66,10 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions ios = FirebaseOptions(
     apiKey: 'AIzaSyDQrehsT00S9-EIDHn-eGBFyMSbDHp8mpc',
-    appId: '1:793717607575:ios:153c1a34111e714787add2',
+    appId: '1:793717607575:ios:146a78833e8d99c387add2',
     messagingSenderId: '793717607575',
     projectId: 'solar-imprint-417411',
     storageBucket: 'solar-imprint-417411.appspot.com',
-    iosBundleId: 'com.example.webViewApp.RunnerTests',
+    iosBundleId: 'site.tobehealthy.webview',
   );
 }
