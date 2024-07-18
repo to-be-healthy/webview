@@ -189,7 +189,7 @@ class _MyAppState extends State<MyApp> {
                 child: InAppWebView(
                   key: webViewKey,
                   initialUrlRequest: URLRequest(
-                    url: WebUri("https://www.to-be-healthy.site/"),
+                    url: WebUri("https://main.to-be-healthy.site/"),
                   ),
                   initialSettings: InAppWebViewSettings(
                     allowsBackForwardNavigationGestures: true,
