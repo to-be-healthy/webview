@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
@@ -108,11 +109,12 @@ Future<void> fcmSetting() async {
     initializationSettings,
   );
 
-  FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-    print('Got a message whilst in the foreground!');
-    print('Message data: ${message.data}');
+  FirebaseMessaging.onMessage.listen(
+    (RemoteMessage message) {
+      print('Got a message whilst in the foreground!');
+      print('Message data: ${message.data}');
 
-    RemoteNotification? notification = message.notification;
+      RemoteNotification? notification = message.notification;
       AndroidNotification? android = message.notification?.android;
 
       if (message.notification != null && android != null) {
@@ -145,41 +147,27 @@ Future<void> fcmSetting() async {
 
 class _MyAppState extends State<MyApp> {
   final GlobalKey webViewKey = GlobalKey();
-  InAppWebViewController? webViewController;
+  late final InAppWebViewController webViewController;
+  DateTime? _lastBackPressed;
 
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
       onWillPop: () async {
-        // detect Android back button click
-        final controller = webViewController;
-        if (controller != null) {
-          if (await controller.canGoBack()) {
-            controller.goBack();
-            return false;
-          } else {
-            // Show dialog when about to exit
-            return await showDialog(
-                  context: context,
-                  builder: (context) => AlertDialog(
-                    title: Text('종료'),
-                    content: Text('정말 건강해짐을 종료하시겠습니까?'),
-                    actions: <Widget>[
-                      TextButton(
-                        onPressed: () => Navigator.of(context).pop(false),
-                        child: Text('아니요'),
-                      ),
-                      TextButton(
-                        onPressed: () => Navigator.of(context).pop(true),
-                        child: Text('네'),
-                      ),
-                    ],
-                  ),
-                ) ??
-                false;
-          }
+        DateTime now = DateTime.now();
+        if (_lastBackPressed == null ||
+        now.difference(_lastBackPressed!) > Duration(seconds: 2)) {
+          _lastBackPressed = now;
+          Fluttertoast.showToast(
+              msg: '한 번 더 누르면 앱이 종료됩니다.',
+              toastLength: Toast.LENGTH_SHORT,
+              gravity: ToastGravity.BOTTOM,
+              backgroundColor: Colors.black,
+              textColor: Colors.white,
+              fontSize: 16.0);
+          return Future.value(false);
         }
-        return true;
+        return Future.value(true);
       },
       child: SafeArea(
         child: Scaffold(
@@ -219,6 +207,39 @@ class _MyAppState extends State<MyApp> {
         ),
       ),
     );
+  }
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    ModalRoute.of(context)?.addScopedWillPopCallback(_onWillPop);
+  }
+
+  @override
+  void dispose() {
+    ModalRoute.of(context)?.removeScopedWillPopCallback(_onWillPop);
+    super.dispose();
+  }
+
+  Future<bool> _onWillPop() async {
+    if (await webViewController.canGoBack()) {
+      webViewController.goBack();
+      return false;
+    } else {
+      DateTime now = DateTime.now();
+      if (_lastBackPressed == null ||
+          now.difference(_lastBackPressed!) > Duration(seconds: 2)) {
+        _lastBackPressed = now;
+        Fluttertoast.showToast(
+            msg: '한 번 더 누르면 앱이 종료됩니다.',
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.BOTTOM,
+            backgroundColor: Colors.black,
+            textColor: Colors.white,
+            fontSize: 16.0);
+        return false;
+      }
+      return true;
+    }
   }
 }
 

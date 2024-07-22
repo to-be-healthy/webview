@@ -1,6 +1,6 @@
 name: web_view_app
 description: "건강해짐 애플리케이션"
-version: 1.0.0+0
+version: 1.0.0+2
 publish_to: 'none'
 
 environment:
@@ -16,6 +16,7 @@ dependencies:
   permission_handler: ^11.3.1
   http: ^1.2.1
   flutter_secure_storage: ^9.2.2
+  fluttertoast: ^8.2.6
 
 dev_dependencies:
   flutter_test:
