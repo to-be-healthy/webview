@@ -5,7 +5,7 @@
 	<key>CADisableMinimumFrameDurationOnPhone</key>
 	<true/>
 	<key>CFBundleDevelopmentRegion</key>
-	<string>$(DEVELOPMENT_LANGUAGE)</string>
+	<string>ko_KR</string>
 	<key>CFBundleDisplayName</key>
 	<string>건강해짐</string>
 	<key>CFBundleExecutable</key>
@@ -32,9 +32,9 @@
 		<true/>
 	</dict>
 	<key>NSCameraUsageDescription</key>
-	<string>앱에서 카메라를 사용하기 위해 권한이 필요합니다.</string>
+	<string>수업일지 또는 식단 업로드를 위해 카메라 권한이 필요합니다.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>앱에서 사진 라이브러리에 접근하기 위해 권한이 필요합니다.</string>
+	<string>수업일지 또는 식단 업로드를 위해 카메라 권한이 필요합니다.</string>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
 	<key>UIBackgroundModes</key>
