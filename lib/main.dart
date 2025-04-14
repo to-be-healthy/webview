@@ -177,7 +177,7 @@ class _MyAppState extends State<MyApp> {
                 child: InAppWebView(
                   key: webViewKey,
                   initialUrlRequest: URLRequest(
-                    url: WebUri("https://main.to-be-healthy.site/"),
+                    url: WebUri("https://main.to-be-healthy.shop/"),
                   ),
                   initialSettings: InAppWebViewSettings(
                     allowsBackForwardNavigationGestures: true,
@@ -248,7 +248,7 @@ Future<void> sendTokenToServer(int memberId, String fcmToken) async {
   debugPrint('fcmToken => $fcmToken');
   String deviceType = Platform.isIOS ? 'IOS' : 'AOS'; // 플랫폼 타입 결정
   final response = await http.post(
-    Uri.parse('https://api.to-be-healthy.site/push/v1/webview'),
+    Uri.parse('https://api.to-be-healthy.shop/push/v1/webview'),
     headers: {'Content-Type': 'application/json'},
     body: jsonEncode(
       {'memberId': memberId, 'token': fcmToken, 'deviceType': deviceType},
