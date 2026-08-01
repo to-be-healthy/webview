@@ -32,7 +32,8 @@ if (keystorePropertiesFile.exists()) {
 
 android {
     namespace = "com.geonganghaejim.app"
-    compileSdk = flutter.compileSdkVersion
+    // permission_handler_android 14.0.0이 SDK 37을 요구해 flutter.compileSdkVersion(36)보다 올림
+    compileSdk = 37
     ndkVersion = flutter.ndkVersion
 
     compileOptions {
