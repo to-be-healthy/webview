@@ -18,11 +18,14 @@ pluginManagement {
 
 plugins {
     id "dev.flutter.flutter-plugin-loader" version "1.0.0"
-    id "com.android.application" version "7.3.0" apply false
+    id "com.android.application" version "8.13.0" apply false
     // START: FlutterFire Configuration
-    id "com.google.gms.google-services" version "4.3.15" apply false
+    id "com.google.gms.google-services" version "4.4.4" apply false
     // END: FlutterFire Configuration
-    id "org.jetbrains.kotlin.android" version "1.7.10" apply false
+    id "org.jetbrains.kotlin.android" version "2.3.20" apply false
+    // Play Console 업로드/트랙 배정/출시노트를 브라우저 대신 API로 처리한다.
+    // 4.0.0은 AGP 9.0.0+를 요구한다. 현재 AGP 8.13.0이므로 3.13.0을 쓴다.
+    id "com.github.triplet.play" version "3.13.0" apply false
 }
 
 include ":app"

@@ -3,6 +3,7 @@ plugins {
     id 'com.google.gms.google-services'
     id "kotlin-android"
     id "dev.flutter.flutter-gradle-plugin"
+    id "com.github.triplet.play"
 }
 
 def localProperties = new Properties()
@@ -30,42 +31,71 @@ if (keystorePropertiesFile.exists()) {
 }
 
 android {
-    namespace = "site.tobehealthy.webview"
+    namespace = "com.geonganghaejim.app"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 
     compileOptions {
+        // flutter_local_notifications가 core library desugaring을 요구한다.
+        coreLibraryDesugaringEnabled = true
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
 
+    kotlinOptions {
+        jvmTarget = JavaVersion.VERSION_17.toString()
+    }
+
     defaultConfig {
-        applicationId = "site.tobehealthy.webview"
+        applicationId = "com.geonganghaejim.app"
         minSdkVersion flutter.minSdkVersion
         minSdk = flutter.minSdkVersion
         targetSdk = flutter.targetSdkVersion
         versionCode = flutterVersionCode.toInteger()
         versionName = flutterVersionName
+        multiDexEnabled = true
     }
 
     signingConfigs {
-        release {
-            keyAlias keystoreProperties['keyAlias']
-            keyPassword keystoreProperties['keyPassword']
-            storeFile file(keystoreProperties['storeFile'])
-            storePassword keystoreProperties['storePassword']
+        // key.properties는 커밋하지 않는다. 없으면 release 서명 설정을 만들지 않는다
+        // (AGP 9부터 signingConfigs 블록이 즉시 평가되어 null이면 빌드가 실패한다).
+        if (keystorePropertiesFile.exists()) {
+            release {
+                keyAlias keystoreProperties['keyAlias']
+                keyPassword keystoreProperties['keyPassword']
+                storeFile file(keystoreProperties['storeFile'])
+                storePassword keystoreProperties['storePassword']
+            }
         }
     }
 
     buildTypes {
         release {
-            // TODO: Add your own signing config for the release build.
-            // Signing with the debug keys for now, so `flutter run --release` works.
-            signingConfig = signingConfigs.release
+            // key.properties가 있으면 release 키로, 없으면 debug 키로 서명한다.
+            signingConfig = keystorePropertiesFile.exists()
+                ? signingConfigs.release
+                : signingConfigs.debug
         }
     }
 }
 
+// Google Play Developer API로 직접 배포한다 (브라우저 조작 대체).
+// 자격증명 키(android/play-service-account.json)는 커밋하지 않으며, 없으면 자동 비활성화된다.
+def playCredentials = rootProject.file('play-service-account.json')
+play {
+    enabled = playCredentials.exists()
+    serviceAccountCredentials = playCredentials
+    defaultToAppBundles = true
+    // 기본은 내부 테스트 + 초안. 실제 트랙은 CLI 옵션으로 덮어쓴다.
+    // 예: ./gradlew publishReleaseBundle --track=production --release-status=completed
+    track = "internal"
+    releaseStatus = com.github.triplet.gradle.androidpublisher.ReleaseStatus.DRAFT
+}
+
 flutter {
     source = "../.."
+}
+
+dependencies {
+    coreLibraryDesugaring "com.android.tools:desugar_jdk_libs:2.1.4"
 }

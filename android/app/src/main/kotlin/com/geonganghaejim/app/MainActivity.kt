@@ -1,4 +1,4 @@
-package site.tobehealthy.webview
+package com.geonganghaejim.app
 
 import io.flutter.embedding.android.FlutterActivity
 
