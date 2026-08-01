@@ -1,36 +1,26 @@
 {
   "project_info": {
-    "project_number": "793717607575",
-    "project_id": "solar-imprint-417411",
-    "storage_bucket": "solar-imprint-417411.appspot.com"
+    "project_number": "212838330552",
+    "project_id": "geonganghaejim-640bf",
+    "storage_bucket": "geonganghaejim-640bf.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:793717607575:android:e4ebe8db6574ea1587add2",
+        "mobilesdk_app_id": "1:212838330552:android:bb05dbc5c981c422ad844d",
         "android_client_info": {
-          "package_name": "site.tobehealthy.webview"
+          "package_name": "com.geonganghaejim.app"
         }
       },
-      "oauth_client": [
-        {
-          "client_id": "793717607575-2hk7b0bfbq202mmlm17br2atqgl1pop4.apps.googleusercontent.com",
-          "client_type": 3
-        }
-      ],
+      "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyBl9TuDJg677hHqs04PtNkpqVuwNYDmUMo"
+          "current_key": "AIzaSyBMRZU_2PDrMr4JWPQeFW2zCSH1z-BPnAA"
         }
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": [
-            {
-              "client_id": "793717607575-2hk7b0bfbq202mmlm17br2atqgl1pop4.apps.googleusercontent.com",
-              "client_type": 3
-            }
-          ]
+          "other_platform_oauth_client": []
         }
       }
     }

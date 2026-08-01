@@ -57,19 +57,18 @@ class DefaultFirebaseOptions {
   );
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyBl9TuDJg677hHqs04PtNkpqVuwNYDmUMo',
-    appId: '1:793717607575:android:e4ebe8db6574ea1587add2',
-    messagingSenderId: '793717607575',
-    projectId: 'solar-imprint-417411',
-    storageBucket: 'solar-imprint-417411.appspot.com',
+    apiKey: 'AIzaSyBMRZU_2PDrMr4JWPQeFW2zCSH1z-BPnAA',
+    appId: '1:212838330552:android:bb05dbc5c981c422ad844d',
+    messagingSenderId: '212838330552',
+    projectId: 'geonganghaejim-640bf',
+    storageBucket: 'geonganghaejim-640bf.firebasestorage.app',
   );
-
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyDQrehsT00S9-EIDHn-eGBFyMSbDHp8mpc',
-    appId: '1:793717607575:ios:146a78833e8d99c387add2',
-    messagingSenderId: '793717607575',
-    projectId: 'solar-imprint-417411',
-    storageBucket: 'solar-imprint-417411.appspot.com',
-    iosBundleId: 'site.tobehealthy.webview',
+    apiKey: 'AIzaSyDaqDnr1muOsEPRll7Sbp-fl3iw-5MPTvE',
+    appId: '1:212838330552:ios:e2d95449187b7974ad844d',
+    messagingSenderId: '212838330552',
+    projectId: 'geonganghaejim-640bf',
+    storageBucket: 'geonganghaejim-640bf.firebasestorage.app',
+    iosBundleId: 'com.geonganghaejim.app',
   );
 }
