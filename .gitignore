@@ -5,9 +5,11 @@
 *.swp
 .DS_Store
 .atom/
+.build/
 .buildlog/
 .history
 .svn/
+.swiftpm/
 migrate_working_dir/
 
 # IntelliJ related
@@ -20,6 +22,9 @@ migrate_working_dir/
 # VS Code which you may wish to be included in version control, so this line
 # is commented out by default.
 #.vscode/
+
+# Environment variables (contains client IDs/secrets — never commit)
+.env
 
 # Flutter/Dart/Pub related
 **/doc/api/
@@ -41,3 +46,16 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# Gradle build output (/build/ 만으로는 android/build/ 가 걸러지지 않는다)
+/android/build/
+
+# Playwright MCP 산출물 (로그인된 세션의 aria 스냅샷·콘솔 로그가 담긴다)
+.playwright-mcp/
+
+# MCP 서버 설정 (개인 홈 절대경로가 들어 있어 공유하지 않는다)
+.mcp.json
+
+# Play 배포 자격증명 (Google Cloud 서비스 계정 키 — 절대 커밋하지 않는다)
+# key.properties는 android/.gitignore가 이미 처리한다.
+android/play-service-account.json
