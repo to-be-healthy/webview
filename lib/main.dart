@@ -16,7 +16,7 @@ import 'firebase_options.dart';
 
 // 백그라운드 설정 코드는 맨 최상단에 위치해야함
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-  print('Handling a background message ${message.messageId}');
+  debugPrint('Handling a background message ${message.messageId}');
 }
 
 final storage = FlutterSecureStorage(); // Secure Storage 인스턴스 생성
@@ -33,7 +33,7 @@ Future<void> main() async {
 
   await Permission.camera.request();
 
-  fcmSetting();
+  await fcmSetting();
 
   if (!kIsWeb &&
       kDebugMode &&
@@ -50,7 +50,7 @@ Future<void> main() async {
 }
 
 class MyApp extends StatefulWidget {
-  const MyApp({Key? key}) : super(key: key);
+  const MyApp({super.key});
 
   @override
   State<MyApp> createState() => _MyAppState();
@@ -76,7 +76,7 @@ Future<void> fcmSetting() async {
     sound: true,
   );
 
-  print('User granted permission: ${settings.authorizationStatus}');
+  debugPrint('User granted permission: ${settings.authorizationStatus}');
 
   const AndroidNotificationChannel channel = AndroidNotificationChannel(
       'high_importance_channel', // id
@@ -103,29 +103,24 @@ Future<void> fcmSetting() async {
           AndroidFlutterLocalNotificationsPlugin>()
       ?.createNotificationChannel(channel);
 
-  await flutterLocalNotificationsPlugin
-      .resolvePlatformSpecificImplementation<
-          IOSFlutterLocalNotificationsPlugin>()
-      ?.getActiveNotifications();
-
   await flutterLocalNotificationsPlugin.initialize(
-    initializationSettings,
+    settings: initializationSettings,
   );
 
   FirebaseMessaging.onMessage.listen(
     (RemoteMessage message) {
-      print('Got a message whilst in the foreground!');
-      print('Message data: ${message.data}');
+      debugPrint('Got a message whilst in the foreground!');
+      debugPrint('Message data: ${message.data}');
 
       RemoteNotification? notification = message.notification;
       AndroidNotification? android = message.notification?.android;
 
       if (message.notification != null && android != null) {
         flutterLocalNotificationsPlugin.show(
-          notification.hashCode,
-          notification?.title,
-          notification?.body,
-          NotificationDetails(
+          id: notification.hashCode,
+          title: notification?.title,
+          body: notification?.body,
+          notificationDetails: NotificationDetails(
             android: AndroidNotificationDetails(
               channel.id,
               channel.name,
@@ -150,99 +145,77 @@ Future<void> fcmSetting() async {
 
 class _MyAppState extends State<MyApp> {
   final GlobalKey webViewKey = GlobalKey();
-  late final InAppWebViewController webViewController;
+  InAppWebViewController? _webViewController;
   DateTime? _lastBackPressed;
+
+  /// 웹뷰 히스토리가 남아 있으면 웹뷰 안에서 뒤로 이동하고,
+  /// 더 이상 뒤로 갈 곳이 없으면 2초 안에 두 번 눌러야 앱을 종료한다.
+  Future<void> _handleBack() async {
+    final controller = _webViewController;
+    if (controller != null && await controller.canGoBack()) {
+      await controller.goBack();
+      return;
+    }
+
+    final now = DateTime.now();
+    if (_lastBackPressed == null ||
+        now.difference(_lastBackPressed!) > const Duration(seconds: 2)) {
+      _lastBackPressed = now;
+      Fluttertoast.showToast(
+          msg: '한 번 더 누르면 앱이 종료됩니다.',
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+          backgroundColor: Colors.black,
+          textColor: Colors.white,
+          fontSize: 16.0);
+      return;
+    }
+
+    await SystemNavigator.pop();
+  }
 
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: () async {
-        DateTime now = DateTime.now();
-        if (_lastBackPressed == null ||
-        now.difference(_lastBackPressed!) > Duration(seconds: 2)) {
-          _lastBackPressed = now;
-          Fluttertoast.showToast(
-              msg: '한 번 더 누르면 앱이 종료됩니다.',
-              toastLength: Toast.LENGTH_SHORT,
-              gravity: ToastGravity.BOTTOM,
-              backgroundColor: Colors.black,
-              textColor: Colors.white,
-              fontSize: 16.0);
-          return Future.value(false);
-        }
-        return Future.value(true);
+    // canPop: false — 뒤로가기를 항상 가로채 _handleBack에서 직접 처리한다.
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) {
+        if (didPop) return;
+        _handleBack();
       },
       child: SafeArea(
         child: Scaffold(
-          body: Column(
-            children: <Widget>[
-              Expanded(
-                child: InAppWebView(
-                  key: webViewKey,
-                  initialUrlRequest: URLRequest(
-                    url: WebUri("https://main.to-be-healthy.shop/"),
-                  ),
-                  initialSettings: InAppWebViewSettings(
-                    allowsBackForwardNavigationGestures: true,
-                    javaScriptEnabled: true,
-                    javaScriptCanOpenWindowsAutomatically: true,
-                  ),
-                  onWebViewCreated: (controller) {
-                    controller.addJavaScriptHandler(
-                      handlerName: 'Channel',
-                      callback: (args) async {
-                        // 로그인 성공 시 FCM 토큰 발급 및 백엔드로 전송
-                        int memberId = args[0];
-                        await storage.write(
-                            key: 'memberId', value: memberId.toString());
-                        String? fcmToken =
-                            await FirebaseMessaging.instance.getToken();
-                        if (fcmToken != null) {
-                          await sendTokenToServer(memberId, fcmToken);
-                        }
-                      },
-                    );
-                  },
-                ),
-              ),
-            ],
+          body: InAppWebView(
+            key: webViewKey,
+            initialUrlRequest: URLRequest(
+              url: WebUri("https://geonganghaejim.site/"),
+            ),
+            initialSettings: InAppWebViewSettings(
+              allowsBackForwardNavigationGestures: true,
+              javaScriptEnabled: true,
+              javaScriptCanOpenWindowsAutomatically: true,
+            ),
+            onWebViewCreated: (controller) {
+              _webViewController = controller;
+              controller.addJavaScriptHandler(
+                handlerName: 'Channel',
+                callback: (args) async {
+                  // 로그인 성공 시 FCM 토큰 발급 및 백엔드로 전송
+                  int memberId = args[0];
+                  await storage.write(
+                      key: 'memberId', value: memberId.toString());
+                  String? fcmToken =
+                      await FirebaseMessaging.instance.getToken();
+                  if (fcmToken != null) {
+                    await sendTokenToServer(memberId, fcmToken);
+                  }
+                },
+              );
+            },
           ),
         ),
       ),
     );
-  }
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    ModalRoute.of(context)?.addScopedWillPopCallback(_onWillPop);
-  }
-
-  @override
-  void dispose() {
-    ModalRoute.of(context)?.removeScopedWillPopCallback(_onWillPop);
-    super.dispose();
-  }
-
-  Future<bool> _onWillPop() async {
-    if (await webViewController.canGoBack()) {
-      webViewController.goBack();
-      return false;
-    } else {
-      DateTime now = DateTime.now();
-      if (_lastBackPressed == null ||
-          now.difference(_lastBackPressed!) > Duration(seconds: 2)) {
-        _lastBackPressed = now;
-        Fluttertoast.showToast(
-            msg: '한 번 더 누르면 앱이 종료됩니다.',
-            toastLength: Toast.LENGTH_SHORT,
-            gravity: ToastGravity.BOTTOM,
-            backgroundColor: Colors.black,
-            textColor: Colors.white,
-            fontSize: 16.0);
-        return false;
-      }
-      return true;
-    }
   }
 }
 
@@ -251,7 +224,7 @@ Future<void> sendTokenToServer(int memberId, String fcmToken) async {
   debugPrint('fcmToken => $fcmToken');
   String deviceType = Platform.isIOS ? 'IOS' : 'AOS'; // 플랫폼 타입 결정
   final response = await http.post(
-    Uri.parse('https://api.to-be-healthy.shop/push/v1/webview'),
+    Uri.parse('https://geonganghaejim.site/api/v1/push/webview'),
     headers: {'Content-Type': 'application/json'},
     body: jsonEncode(
       {'memberId': memberId, 'token': fcmToken, 'deviceType': deviceType},
